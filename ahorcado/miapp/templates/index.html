@@ -1,0 +1,657 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AHORCADO</title>
+    <style>
+        /* Estilo para el nombre del usuario en la parte superior derecha */
+        .username {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-weight: bold;
+            font-size: 120%;
+        }
+
+        .puntaje {
+            position: absolute;
+            top: 40px;
+            right: 10px;
+            font-weight: bold;
+            font-size: 120%;
+        }
+
+        .partidasGanadas {
+            position: absolute;
+            top: 70px;
+            right: 10px;
+            font-weight: bold;
+            font-size: 120%;
+        }
+
+        .partidasPerdidas {
+            position: absolute;
+            top: 100px;
+            right: 10px;
+            font-weight: bold;
+            font-size: 120%;
+        }
+    </style>
+    <style>
+        .mensaje {
+            text-align: center;
+            font-size: 24px;
+            color: white;
+            opacity: 0;
+            /* Inicialmente oculto */
+            animation: parpadeo 1s infinite alternate;
+        }
+
+        .mostrar {
+            opacity: 1;
+            /* Mostrar */
+        }
+
+        @keyframes parpadeo {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Variabes */
+        /* Mixin's */
+        body {
+            background-color: #8c0606;
+            /* background-color: black; */
+            font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            color: #fff;
+            height: 100%;
+            text-align: center;
+            font-size: 18px;
+        }
+
+
+        .wrappper {
+            width: 100%;
+        }
+
+        .wrappper:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        canvas {
+            color: #fff;
+            margin-top: -60px;
+            border: #fff dashed 3px;
+            padding: 25px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 100;
+            text-transform: uppercase;
+            margin: 5px 0;
+        }
+
+        h1 {
+            font-weight: bold;
+            font-size: 2.3em;
+        }
+
+        h2 {
+            font-size: 1.6em;
+        }
+
+        p {
+            font-size: 1.4em;
+        }
+
+        #alphabet {
+            margin: 15px auto;
+            padding: 0;
+            max-width: 900px;
+        }
+
+        #alphabet:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        #alphabet li {
+            float: left;
+            margin: 0 10px 10px 0;
+            list-style: none;
+            width: 35px;
+            height: 30px;
+            padding-top: 10px;
+            background: #fff;
+            color: #8c0606;
+            cursor: pointer;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            -khtml-border-radius: 5px;
+            border: solid 1px #fff;
+        }
+
+        #alphabet li:hover {
+            background: #044adf;
+            border: solid 1px #fff;
+            color: #fff;
+        }
+
+        #my-word {
+            margin: 0;
+            display: block;
+            padding: 0;
+            display: block;
+        }
+
+        #my-word li {
+            position: relative;
+            list-style: none;
+            margin: 0;
+            display: inline-block;
+            padding: 0 10px;
+            font-size: 1.6em;
+        }
+
+        .active {
+            opacity: 0.4;
+            filter: alpha(opacity=40);
+            -moz-transition: all 1s ease-in;
+            -moz-transition: all 0.3s ease-in-out;
+            -webkit-transition: all 0.3s ease-in-out;
+            cursor: default;
+        }
+
+        .active:hover {
+            -moz-transition: all 1s ease-in;
+            -moz-transition: all 0.3s ease-in-out;
+            -webkit-transition: all 0.3s ease-in-out;
+            opacity: 0.4;
+            filter: alpha(opacity=40);
+            -moz-transition: all 1s ease-in;
+            -moz-transition: all 0.3s ease-in-out;
+            -webkit-transition: all 0.3s ease-in-out;
+        }
+
+        #mylives {
+            font-size: 1.6em;
+            text-align: center;
+            display: block;
+        }
+
+        button {
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            -khtml-border-radius: 5px;
+            background: #8c0606;
+            color: #fff;
+            border: solid 1px #fff;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 18px 10px;
+            width: 180px;
+            margin: 10px;
+            outline: none;
+        }
+
+        button:hover {
+            -webkit-transition: all 0.3s ease-in-out;
+            -moz-transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            background: #fff;
+            border: solid 1px #fff;
+            color: #044adf;
+        }
+
+        @media (max-width: 767px) {
+            #alphabet {
+                padding: 0 0 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #alphabet {
+                padding: 0 0 0 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1 style="margin-top: 20px;">JUEGO EL AHORCADO</h1>
+    </div>
+    <div class="wrapper">
+        <div style="margin-left: 550px; margin-top: 50px;">
+            <p style="font-size: 35px;">ALFABETO</p>
+            <div id="buttons"></div>
+        </div>
+        <div style="margin-left: 500px;">
+            <p id="catagoryName"></p>
+            <div id="hold">
+            </div>
+            <p id="mylives"></p>
+            <p id="clue">Pista -</p>
+        </div>
+        <div style="margin-right: 800px; margin-top: -350px;">
+            <canvas id="stickman">This Text will show if the Browser does NOT support HTML5 Canvas tag</canvas>
+            <div class="container">
+                <button id="hint">Pista</button>
+                <button id="reset">Jugar Otra Vez</button>
+            </div>
+        </div>
+    </div>
+    <audio id="audioPlayer" controls style="display: none;">
+        <source src="{% static 'win.mp3' %}" type="audio/mpeg">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+    <audio id="audioPerdedor" controls style="display: none;">
+        <source src="{% static 'Loser.mp3' %}" type="audio/mpeg">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+    <audio id="audioCorrecto" controls style="display: none;">
+        <source src="{% static 'Done.mp3' %}" type="audio/mpeg">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+    <audio id="audioIncorrecto" controls style="display: none;">
+        <source src="{% static 'Incorrect.mp3' %}" type="audio/mpeg">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.1/dist/confetti.browser.min.js"></script>
+    <script>
+
+        var audio = document.getElementById('audioPlayer');
+        var audioDone = document.getElementById('audioCorrecto');
+        var audioIncorrect = document.getElementById('audioIncorrecto');
+        var audioLoser = document.getElementById('audioPerdedor');
+        var _puntajeTotal = 0;
+        var continuarJugando = true;
+
+        playAudio = function () {
+            audio.play();
+        }
+
+        playAudioLoser = function () {
+            audioLoser.play();
+        }
+
+        playAudioDone = function () {
+            audioDone.play();
+        }
+
+        playAudioIncorrect = function () {
+            audioIncorrect.play();
+        }
+
+        onConfetti = function () {
+            confetti({
+                particleCount: 300,
+                spread: 360,
+            });
+        };
+        // Obtener el nombre de usuario del almacenamiento local
+        var username = localStorage.getItem("username");
+        var puntajeValue = localStorage.getItem("puntaje");
+        var partidasGanadasValue = localStorage.getItem("partidasGanadas");
+        var partidasPerdidasValue = localStorage.getItem("partidasPerdidas");
+
+        // Crear un elemento para mostrar el nombre de usuario en la parte superior derecha
+        var usernameElement = document.createElement("div");
+        usernameElement.classList.add("username");
+        usernameElement.textContent = "Bienvenido(a): " + username;
+
+        // Agregar el elemento al cuerpo del documento
+        document.body.appendChild(usernameElement);
+
+        var divPuntaje = document.createElement("div");
+        divPuntaje.classList.add("puntaje");
+        divPuntaje.setAttribute("id", "puntajeId");
+        divPuntaje.textContent = "Puntaje: " + (puntajeValue === null ? 0 : puntajeValue);
+        document.body.appendChild(divPuntaje);
+
+
+        var divPartGana = document.createElement("div");
+        divPartGana.classList.add("partidasGanadas");
+        divPartGana.setAttribute("id", "partidasGanadasId");
+        divPartGana.textContent = "Partidas Ganadas: " + (partidasGanadasValue === null ? 0 : partidasGanadasValue);
+        document.body.appendChild(divPartGana);
+
+        var divPartPerd = document.createElement("div");
+        divPartPerd.classList.add("partidasPerdidas");
+        divPartPerd.setAttribute("id", "partidasPerdidasId");
+        divPartPerd.textContent = "Partidas Perdidas: " + (partidasPerdidasValue === null ? 0 : partidasPerdidasValue);
+        document.body.appendChild(divPartPerd);
+
+        window.onload = function () {
+
+            var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+                'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+                't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
+
+            var categories;         // Array of topics
+            var chosenCategory;     // Selected catagory
+            var getHint;          // Word getHint
+            var word;              // Selected word
+            var guess;             // Geuss
+            var geusses = [];      // Stored geusses
+            var lives;             // Lives
+            var counter;           // Count correct geusses
+            var space;              // Number of spaces in word '-'
+
+            // Get elements
+            var showLives = document.getElementById("mylives");
+            var showCatagory = document.getElementById("scatagory");
+            var getHint = document.getElementById("hint");
+            var showClue = document.getElementById("clue");
+
+
+
+            // create alphabet ul
+            var buttons = function () {
+                myButtons = document.getElementById('buttons');
+                letters = document.createElement('ul');
+
+                for (var i = 0; i < alphabet.length; i++) {
+                    letters.id = 'alphabet';
+                    list = document.createElement('li');
+                    list.id = 'letter';
+                    list.innerHTML = alphabet[i];
+                    check();
+                    myButtons.appendChild(letters);
+                    letters.appendChild(list);
+                }
+            }
+
+
+            // Select Catagory
+            var selectCat = function () {
+                /*
+                if (chosenCategory === categories[0]) {
+                    catagoryName.innerHTML = "La categoría elegida es la de equipos de fútbol de la Premier League.";
+                } else if (chosenCategory === categories[1]) {
+                    catagoryName.innerHTML = "La categoría elegida son las peliculas.";
+                } else if (chosenCategory === categories[2]) {
+                    catagoryName.innerHTML = "La categoría elegida son las ciudades.";
+                }
+                */
+            }
+
+            // Create geusses ul
+            result = function () {
+                wordHolder = document.getElementById('hold');
+                correct = document.createElement('ul');
+
+                for (var i = 0; i < word.length; i++) {
+                    correct.setAttribute('id', 'my-word');
+                    guess = document.createElement('li');
+                    guess.setAttribute('class', 'guess');
+                    if (word[i] === "-") {
+                        guess.innerHTML = "-";
+                        space = 1;
+                    } else {
+                        guess.innerHTML = "_";
+                    }
+
+                    geusses.push(guess);
+                    wordHolder.appendChild(correct);
+                    correct.appendChild(guess);
+                }
+            }
+
+            // Show lives
+            comments = function () {
+                showLives.innerHTML = "Tienes " + lives + " Vidas";
+                if (lives < 1) {
+                    //showLives.innerHTML = "¡Perdiste!";
+                    showLives.innerHTML = `<div id="mensaje" class="mensaje">
+                                                Lo sentimos, has perdido :(
+                                            </div>`;
+
+                    var mensaje = document.getElementById("mensaje");
+                    mensaje.classList.add("mostrar");
+                    playAudioLoser();
+                    let currentValue = Number(localStorage.getItem("puntaje"));
+                    currentValue -= 5;
+                    localStorage.setItem("puntaje", currentValue.toString());
+                    showPuntaje = document.getElementById("puntajeId");
+                    showPuntaje.innerHTML = "Puntaje: " + currentValue.toString();
+
+                    let currentPartidasPerdiValue = Number(localStorage.getItem("partidasPerdidas"));
+                    currentPartidasPerdiValue += 1;
+                    localStorage.setItem("partidasPerdidas", currentPartidasPerdiValue.toString());
+                    var showPartGana = document.getElementById("partidasPerdidasId");
+                    showPartGana.innerHTML = "Partidas Perdidas: " + currentPartidasPerdiValue.toString();
+
+                   continuarJugando = false;
+
+                }
+                //for (var i = 0; i < geusses.length; i++) {
+                if (counter + space === geusses.length) {
+                    showLives.innerHTML = "¡Ganaste!";
+                    let currentValue = Number(localStorage.getItem("puntaje"));
+                    currentValue += 10;
+                    localStorage.setItem("puntaje", currentValue.toString());
+                    showPuntaje = document.getElementById("puntajeId");
+                    showPuntaje.innerHTML = "Puntaje: " + currentValue.toString();
+
+                    let currentPartidasGanadasValue = Number(localStorage.getItem("partidasGanadas"));
+                    currentPartidasGanadasValue += 1;
+                    localStorage.setItem("partidasGanadas", currentPartidasGanadasValue.toString());
+                    var showPartGana = document.getElementById("partidasGanadasId");
+                    showPartGana.innerHTML = "Partidas Ganadas: " + currentPartidasGanadasValue.toString();
+
+                    onConfetti();
+                    playAudio();
+                    continuarJugando = false;
+                }
+                //}
+            }
+
+            // Animate man
+            var animate = function () {
+                var drawMe = lives;
+                drawArray[drawMe]();
+            }
+
+
+            // Hangman
+            canvas = function () {
+
+                myStickman = document.getElementById("stickman");
+                context = myStickman.getContext('2d');
+                context.beginPath();
+                context.strokeStyle = "#fff";
+                context.lineWidth = 2;
+            };
+
+            head = function () {
+                myStickman = document.getElementById("stickman");
+                context = myStickman.getContext('2d');
+                context.beginPath();
+                context.arc(60, 25, 10, 0, Math.PI * 2, true);
+                context.stroke();
+            }
+
+            draw = function ($pathFromx, $pathFromy, $pathTox, $pathToy) {
+
+                context.moveTo($pathFromx, $pathFromy);
+                context.lineTo($pathTox, $pathToy);
+                context.stroke();
+            }
+
+            frame1 = function () {
+                draw(0, 150, 150, 150);
+            };
+
+            frame2 = function () {
+                draw(10, 0, 10, 600);
+            };
+
+            frame3 = function () {
+                draw(0, 5, 70, 5);
+            };
+
+            frame4 = function () {
+                draw(60, 5, 60, 15);
+            };
+
+            torso = function () {
+                draw(60, 36, 60, 70);
+            };
+
+            rightArm = function () {
+                draw(60, 46, 100, 50);
+            };
+
+            leftArm = function () {
+                draw(60, 46, 20, 50);
+            };
+
+            rightLeg = function () {
+                draw(60, 70, 100, 100);
+            };
+
+            leftLeg = function () {
+                draw(60, 70, 20, 100);
+            };
+
+            drawArray = [rightLeg, leftLeg, rightArm, leftArm, torso, head, frame4, frame3, frame2, frame1];
+
+
+            // OnClick Function
+            check = function () {
+
+                list.onclick = function () {
+                    if (continuarJugando) {
+                        var geuss = (this.innerHTML);
+                        this.setAttribute("class", "active");
+                        this.onclick = null;
+                        for (var i = 0; i < word.length; i++) {
+                            if (word[i] === geuss) {
+                                geusses[i].innerHTML = geuss;
+                                counter += 1;
+                            }
+                        }
+                        var j = (word.indexOf(geuss));
+                        if (j === -1) {
+                            playAudioIncorrect()
+                            lives -= 1;
+                            comments();
+                            animate();
+                        } else {
+                            playAudioDone()
+                            comments();
+                        }
+                    }
+
+                }
+
+            }
+            let mispalabras = []
+            let mispistas = []
+
+            // Play
+            play = async function () {
+
+                try {
+                    const respuesta = await fetch(`${window.origin}/get-palabras/`);
+                    const data = await respuesta.json();
+                    console.log('data', data)
+                    for (let index = 0; index < data.palabras.length; index++) {
+                        word = data.palabras[index];
+                        //console.log('palabra',word.palabra)
+                        mispalabras.push(word.palabra)
+                        mispistas.push(word.pista)
+
+                    }
+
+                } catch (Exception) {
+                    console.log(Exception)
+                }
+                categories = mispalabras;
+
+                /*
+                categories = [
+                    ["everton", "liverpool", "swansea", "chelsea", "hull", "manchester-city", "newcastle-united"],
+                    ["alien", "dirty-harry", "gladiator", "finding-nemo", "jaws"],
+                    ["manchester", "milan", "madrid", "amsterdam", "prague"]
+                ];
+                */
+
+                //chosenCategory = categories[Math.floor(Math.random() * categories.length)];
+                word = categories[Math.floor(Math.random() * categories.length)];
+                //word = chosenCategory[Math.floor(Math.random() * chosenCategory.length)];
+                //word = word.replace(/\s/g, "-");
+                console.log(word);
+                buttons();
+
+                geusses = [];
+                lives = 10;
+                counter = 0;
+                space = 0;
+                result();
+                comments();
+                selectCat();
+                canvas();
+            }
+
+            play();
+
+            // Hint
+
+            hint.onclick = function () {
+
+                /*
+                hints = [
+                    ["Based in Mersyside", "Based in Mersyside", "First Welsh team to reach the Premier Leauge", "Owned by A russian Billionaire", "Once managed by Phil Brown", "2013 FA Cup runners up", "Gazza's first club"],
+                    ["Science-Fiction horror film", "1971 American action film", "Historical drama", "Anamated Fish", "Giant great white shark"],
+                    ["Northern city in the UK", "Home of AC and Inter", "Spanish capital", "Netherlands capital", "Czech Republic capital"]
+                ];
+                */
+                hints = mispistas;
+
+                //var catagoryIndex = categories.indexOf(chosenCategory);
+                //var hintIndex = chosenCategory.indexOf(word);
+                var hintIndex = categories.indexOf(word);
+                showClue.innerHTML = "Pista: - " + hints[hintIndex];
+            };
+
+            // Reset
+
+            document.getElementById('reset').onclick = function () {
+                correct.parentNode.removeChild(correct);
+                letters.parentNode.removeChild(letters);
+                showClue.innerHTML = "";
+                continuarJugando = true;
+                context.clearRect(0, 0, 400, 400);
+                play();
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>

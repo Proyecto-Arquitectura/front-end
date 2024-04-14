@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUEGO EL AHORCADO</title>
+    <style>
+        body {
+            background-color: #8c0606;
+            font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            color: #fff;
+            height: 100%;
+            text-align: center;
+            font-size: 18px;
+        }
+
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* Un solo columna */
+            gap: 20px;
+            /* Espacio entre las filas */
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #58DA1E;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #58DA1E;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-container">
+        <div>
+            <h1 style="font-size: 70px; color: #fff; margin-top: 20px;">EL AHORCADO</h1>
+            <p style="font-size: 25px;">¡Utilice el alfabeto a continuación para adivinar la palabra o haga clic en la
+                pista para obtener una pista!
+            </p>
+        </div>
+
+        <div class="container" style="margin-left: 400px;">
+            <h1>NOMBRE DE USUARIO</h1>
+            <form id="userForm" action="index.html" method="GET">
+                <label for="username">Nombre:</label>
+                <input type="text" id="username" name="username" required>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        document.getElementById("userForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Evitar que se envíe el formulario automáticamente
+
+            var username = document.getElementById("username").value;
+            localStorage.setItem("username", username); // Guardar el nombre de usuario en el almacenamiento local
+            localStorage.setItem("puntaje", "0"); 
+            localStorage.setItem("partidasGanadas", "0"); 
+            localStorage.setItem("partidasPerdidas", "0"); 
+            window.location.href = "/index"; // Redirigir a game.html
+        });
+    </script>
+</body>
+
+</html>
